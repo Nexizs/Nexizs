@@ -26,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import eu.kanade.core.preference.PreferenceMutableState
@@ -108,7 +109,7 @@ fun LibraryContent(
             )
         }
 
-        // Glass filter chips
+        // Glass filter chips (equal width, fill the row)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -121,16 +122,18 @@ fun LibraryContent(
                 Text(
                     text = chip.label,
                     color = if (selected) Color(0xFF1E1147) else Color(0xFFEDEBFF),
-                    fontSize = 12.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.SemiBold,
+                    textAlign = TextAlign.Center,
                     maxLines = 1,
                     softWrap = false,
                     modifier = Modifier
+                        .weight(1f)
                         .clip(shape)
                         .background(if (selected) Color(0xFFA78BFA) else Color(0x33A78BFA))
                         .border(width = 1.dp, color = Color(0x55FFFFFF), shape = shape)
                         .clickable { selectedChip = chip }
-                        .padding(horizontal = 10.dp, vertical = 8.dp),
+                        .padding(vertical = 8.dp),
                 )
             }
         }
