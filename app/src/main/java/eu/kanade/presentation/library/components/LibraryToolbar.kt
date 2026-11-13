@@ -3,6 +3,7 @@ package eu.kanade.presentation.library.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,9 +11,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -24,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -98,26 +103,12 @@ private fun LibraryRegularToolbar(
             .statusBarsPadding()
             .padding(horizontal = 16.dp, vertical = 8.dp),
     ) {
+        // Top row: only action buttons, right aligned
         Row(
             modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = title.text,
-                style = MaterialTheme.typography.headlineLarge,
-                fontWeight = FontWeight.Bold,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.weight(1f, false),
-            )
-            if (title.numberOfManga != null) {
-                Pill(
-                    text = "${title.numberOfManga}",
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = pillAlpha),
-                    fontSize = 14.sp,
-                )
-            }
-            Spacer(modifier = Modifier.weight(1f))
             AppBarActions(
                 listOf(
                     AppBar.Action(
@@ -142,40 +133,79 @@ private fun LibraryRegularToolbar(
             )
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(28.dp))
 
-        Box(
+        // Big title
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = title.text,
+                style = MaterialTheme.typography.headlineLarge,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f, false),
+            )
+            if (title.numberOfManga != null) {
+                Pill(
+                    text = "${title.numberOfManga}",
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = pillAlpha),
+                    fontSize = 14.sp,
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(14.dp))
+
+        // Glass search bar with icon
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(glassShape)
                 .background(Color(0x33A78BFA))
                 .border(width = 1.dp, color = Color(0x55FFFFFF), shape = glassShape)
                 .padding(horizontal = 20.dp, vertical = 14.dp),
-            contentAlignment = Alignment.CenterStart,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            BasicTextField(
-                value = searchQuery.orEmpty(),
-                onValueChange = { onSearchQueryChange(it.ifEmpty { null }) },
-                singleLine = true,
-                textStyle = TextStyle(
-                    color = MaterialTheme.colorScheme.onBackground,
-                    fontSize = 16.sp,
-                ),
-                cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
-                modifier = Modifier.fillMaxWidth(),
-                decorationBox = { innerTextField ->
-                    Box(contentAlignment = Alignment.CenterStart) {
-                        if (searchQuery.isNullOrEmpty()) {
-                            Text(
-                                text = "Search library",
-                                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.55f),
-                                fontSize = 16.sp,
-                            )
-                        }
-                        innerTextField()
-                    }
-                },
+            Icon(
+                painter = painterResource(android.R.drawable.ic_menu_search),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                modifier = Modifier.size(20.dp),
             )
+            Spacer(modifier = Modifier.width(12.dp))
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.CenterStart,
+            ) {
+                BasicTextField(
+                    value = searchQuery.orEmpty(),
+                    onValueChange = { onSearchQueryChange(it.ifEmpty { null }) },
+                    singleLine = true,
+                    textStyle = TextStyle(
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontSize = 16.sp,
+                    ),
+                    cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+                    modifier = Modifier.fillMaxWidth(),
+                    decorationBox = { innerTextField ->
+                        Box(contentAlignment = Alignment.CenterStart) {
+                            if (searchQuery.isNullOrEmpty()) {
+                                Text(
+                                    text = "Search \"Drama, -Comedy\"",
+                                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.55f),
+                                    fontSize = 16.sp,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis,
+                                )
+                            }
+                            innerTextField()
+                        }
+                    },
+                )
+            }
         }
     }
 }
