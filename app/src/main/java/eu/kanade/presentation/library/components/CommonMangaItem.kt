@@ -1,6 +1,7 @@
 package eu.kanade.presentation.library.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -77,8 +78,8 @@ fun MangaCompactGridItem(
     title: String? = null,
     onClickContinueReading: (() -> Unit)? = null,
     coverAlpha: Float = 1f,
-    coverBadgeStart: @Composable (RowScope.() -> Unit)? = null,
-    coverBadgeEnd: @Composable (RowScope.() -> Unit)? = null,
+    coverBadgeStart: (@Composable RowScope.() -> Unit)? = null,
+    coverBadgeEnd: (@Composable RowScope.() -> Unit)? = null,
 ) {
     GridItemSelectable(
         isSelected = isSelected,
@@ -229,6 +230,7 @@ fun MangaComfortableGridItem(
 
 /**
  * Common cover layout to add contents to be drawn on top of the cover.
+ * Glass outline + rounded corners are applied here.
  */
 @Composable
 private fun MangaGridCover(
@@ -238,10 +240,13 @@ private fun MangaGridCover(
     badgesEnd: (@Composable RowScope.() -> Unit)? = null,
     content: @Composable (BoxScope.() -> Unit)? = null,
 ) {
+    val coverShape = RoundedCornerShape(12.dp)
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .aspectRatio(MangaCover.Book.ratio),
+            .aspectRatio(MangaCover.Book.ratio)
+            .clip(coverShape)
+            .border(width = 1.dp, color = Color(0x66FFFFFF), shape = coverShape),
     ) {
         cover()
         content?.invoke(this)
