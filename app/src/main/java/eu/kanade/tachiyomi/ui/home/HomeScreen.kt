@@ -3,8 +3,20 @@ package eu.kanade.tachiyomi.ui.home
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Badge
+import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,9 +30,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -63,12 +82,20 @@ object HomeScreen : Screen() {
     @Suppress("ConstPropertyName")
     private const val TabNavigatorKey = "HomeTabs"
 
+    // Tablet rail keeps all tabs
     private val TABS = listOf(
         LibraryTab,
         UpdatesTab,
         HistoryTab,
         BrowseTab,
         MoreTab,
+    )
+
+    // Phone glass bar shows only these 3 tabs
+    private val GLASS_TABS = listOf(
+        LibraryTab,
+        HistoryTab,
+        BrowseTab,
     )
 
     @Composable
@@ -87,9 +114,11 @@ object HomeScreen : Screen() {
                     NavigationSuiteType.NavigationBar
                 }
                 val navigationSuiteState = rememberNavigationSuiteScaffoldState()
+                var glassBarVisible by remember { mutableStateOf(true) }
                 LaunchedEffect(navigationSuiteState, tabletUi) {
                     if (tabletUi) navigationSuiteState.show()
                     showBottomNavEvent.receiveAsFlow().collectLatest { show ->
+                        glassBarVisible = show
                         if (tabletUi || show) {
                             navigationSuiteState.show()
                         } else {
@@ -98,18 +127,7 @@ object HomeScreen : Screen() {
                     }
                 }
 
-                NavigationSuiteScaffold(
-                    navigationSuiteType = navigationSuiteType,
-                    state = navigationSuiteState,
-                    navigationSuiteColors = NavigationSuiteDefaults.colors(
-                        navigationRailContainerColor = MaterialTheme.colorScheme
-                            .surfaceColorAtElevation(3.dp),
-                    ),
-                    navigationItemVerticalArrangement = Arrangement.Center,
-                    navigationItems = {
-                        TABS.fastForEach { NavigationSuiteItem(it, navigationSuiteType) }
-                    },
-                ) {
+                val tabContent: @Composable () -> Unit = {
                     AnimatedContent(
                         targetState = tabNavigator.current,
                         transitionSpec = {
@@ -125,41 +143,132 @@ object HomeScreen : Screen() {
                         }
                     }
                 }
-            }
 
-            val goToLibraryTab = { tabNavigator.current = LibraryTab }
-
-            BackHandler(enabled = tabNavigator.current != LibraryTab, onBack = goToLibraryTab)
-
-            LaunchedEffect(Unit) {
-                launch {
-                    librarySearchEvent.receiveAsFlow().collectLatest {
-                        goToLibraryTab()
-                        LibraryTab.search(it)
+                if (tabletUi) {
+                    NavigationSuiteScaffold(
+                        navigationSuiteType = navigationSuiteType,
+                        state = navigationSuiteState,
+                        navigationSuiteColors = NavigationSuiteDefaults.colors(
+                            navigationRailContainerColor = MaterialTheme.colorScheme
+                                .surfaceColorAtElevation(3.dp),
+                        ),
+                        navigationItemVerticalArrangement = Arrangement.Center,
+                        navigationItems = {
+                            TABS.fastForEach { NavigationSuiteItem(it, navigationSuiteType) }
+                        },
+                    ) {
+                        tabContent()
+                    }
+                } else {
+                    Box(modifier = Modifier.fillMaxSize()) {
+                        tabContent()
+                        if (glassBarVisible) {
+                            GlassNavBar(modifier = Modifier.align(Alignment.BottomCenter))
+                        }
                     }
                 }
-                launch {
-                    openTabEvent.receiveAsFlow().collectLatest {
-                        tabNavigator.current = when (it) {
-                            is Tab.Library -> LibraryTab
-                            Tab.Updates -> UpdatesTab
-                            Tab.History -> HistoryTab
-                            is Tab.Browse -> {
-                                if (it.toExtensions) {
-                                    BrowseTab.showExtension()
-                                }
-                                BrowseTab
-                            }
-                            is Tab.More -> MoreTab
-                        }
 
-                        if (it is Tab.Library && it.mangaIdToOpen != null) {
-                            navigator.push(MangaScreen(it.mangaIdToOpen))
-                        }
-                        if (it is Tab.More && it.toDownloads) {
-                            navigator.push(DownloadQueueScreen)
+                val goToLibraryTab = { tabNavigator.current = LibraryTab }
+
+                BackHandler(enabled = tabNavigator.current != LibraryTab, onBack = goToLibraryTab)
+
+                LaunchedEffect(Unit) {
+                    launch {
+                        librarySearchEvent.receiveAsFlow().collectLatest {
+                            goToLibraryTab()
+                            LibraryTab.search(it)
                         }
                     }
+                    launch {
+                        openTabEvent.receiveAsFlow().collectLatest {
+                            tabNavigator.current = when (it) {
+                                is Tab.Library -> LibraryTab
+                                Tab.Updates -> UpdatesTab
+                                Tab.History -> HistoryTab
+                                is Tab.Browse -> {
+                                    if (it.toExtensions) {
+                                        BrowseTab.showExtension()
+                                    }
+                                    BrowseTab
+                                }
+                                is Tab.More -> MoreTab
+                            }
+
+                            if (it is Tab.Library && it.mangaIdToOpen != null) {
+                                navigator.push(MangaScreen(it.mangaIdToOpen))
+                            }
+                            if (it is Tab.More && it.toDownloads) {
+                                navigator.push(DownloadQueueScreen)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @Composable
+    private fun GlassNavBar(modifier: Modifier = Modifier) {
+        val tabNavigator = LocalTabNavigator.current
+        val navigator = LocalNavigator.currentOrThrow
+        val scope = rememberCoroutineScope()
+        val barShape = RoundedCornerShape(32.dp)
+        val itemShape = RoundedCornerShape(24.dp)
+        Row(
+            modifier = modifier
+                .navigationBarsPadding()
+                .padding(horizontal = 16.dp, vertical = 12.dp)
+                .fillMaxWidth()
+                .clip(barShape)
+                .background(Color(0xCC1B1840))
+                .border(width = 1.dp, color = Color(0x55FFFFFF), shape = barShape)
+                .padding(6.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            GLASS_TABS.fastForEach { tab ->
+                val selected = tabNavigator.current::class == tab::class
+                val badge = tabBadge(tab)
+                val contentColor = if (selected) Color.White else Color(0xFFB9B4DA)
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .clip(itemShape)
+                        .background(if (selected) Color(0x44A78BFA) else Color.Transparent)
+                        .pointerInput(tab, selected) {
+                            detectTapGestures(
+                                onLongPress = {
+                                    // Long-press Library icon = open More (Settings)
+                                    if (tab == LibraryTab) {
+                                        tabNavigator.current = MoreTab
+                                    }
+                                },
+                                onTap = {
+                                    if (!selected) {
+                                        tabNavigator.current = tab
+                                    } else {
+                                        scope.launch { tab.onReselect(navigator) }
+                                    }
+                                },
+                            )
+                        }
+                        .padding(vertical = 8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    BadgedBox(badge = { badge?.invoke() }) {
+                        Icon(
+                            painter = tab.options.icon!!,
+                            contentDescription = tab.options.title,
+                            tint = contentColor,
+                        )
+                    }
+                    Text(
+                        text = tab.options.title,
+                        style = MaterialTheme.typography.labelSmall,
+                        color = contentColor,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 }
             }
         }
