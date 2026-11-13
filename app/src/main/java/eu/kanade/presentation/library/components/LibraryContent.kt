@@ -113,7 +113,7 @@ fun LibraryContent(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp, vertical = 10.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             LibraryChip.entries.forEach { chip ->
                 val selected = chip == selectedChip
@@ -121,14 +121,16 @@ fun LibraryContent(
                 Text(
                     text = chip.label,
                     color = if (selected) Color(0xFF1E1147) else Color(0xFFEDEBFF),
-                    fontSize = 14.sp,
+                    fontSize = 13.sp,
                     fontWeight = FontWeight.SemiBold,
+                    maxLines = 1,
+softWrap = false,
                     modifier = Modifier
                         .clip(shape)
                         .background(if (selected) Color(0xFFA78BFA) else Color(0x33A78BFA))
                         .border(width = 1.dp, color = Color(0x55FFFFFF), shape = shape)
                         .clickable { selectedChip = chip }
-                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                        .padding(horizontal = 10.dp, vertical = 8.dp),
                 )
             }
         }
