@@ -28,14 +28,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import eu.kanade.presentation.components.AppBar
 import eu.kanade.presentation.components.AppBarActions
+import eu.kanade.tachiyomi.ui.setting.SettingsScreen
+import eu.kanade.tachiyomi.ui.stats.StatsScreen
 import mihon.icons.materialsymbols.MaterialSymbols
 import mihon.icons.materialsymbols.rounded.FilterList
 import mihon.icons.materialsymbols.rounded.FlipToBack
@@ -93,6 +98,8 @@ private fun LibraryRegularToolbar(
     onClickOpenRandomManga: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior?,
 ) {
+    val navigator = LocalNavigator.currentOrThrow
+    val uriHandler = LocalUriHandler.current
     val pillAlpha = if (isSystemInDarkTheme()) 0.12f else 0.08f
     val filterTint = if (hasFilters) MaterialTheme.colorScheme.active else LocalContentColor.current
     val glassShape = RoundedCornerShape(28.dp)
@@ -101,7 +108,7 @@ private fun LibraryRegularToolbar(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 2.dp),
     ) {
         // Top row: only action buttons, right aligned
         Row(
@@ -116,6 +123,22 @@ private fun LibraryRegularToolbar(
                         icon = MaterialSymbols.Rounded.FilterList,
                         iconTint = filterTint,
                         onClick = onClickFilter,
+                    ),
+                    AppBar.OverflowAction(
+                        title = stringResource(MR.strings.label_settings),
+                        onClick = { navigator.push(SettingsScreen()) },
+                    ),
+                    AppBar.OverflowAction(
+                        title = stringResource(MR.strings.label_stats),
+                        onClick = { navigator.push(StatsScreen()) },
+                    ),
+                    AppBar.OverflowAction(
+                        title = "About",
+                        onClick = { navigator.push(SettingsScreen(SettingsScreen.Destination.About)) },
+                    ),
+                    AppBar.OverflowAction(
+                        title = stringResource(MR.strings.label_help),
+                        onClick = { uriHandler.openUri("https://mihon.app/docs") },
                     ),
                     AppBar.OverflowAction(
                         title = stringResource(MR.strings.action_update_library),
@@ -133,7 +156,7 @@ private fun LibraryRegularToolbar(
             )
         }
 
-        Spacer(modifier = Modifier.height(56.dp))
+        Spacer(modifier = Modifier.height(4.dp))
 
         // Big title
         Row(
@@ -157,7 +180,7 @@ private fun LibraryRegularToolbar(
             }
         }
 
-        Spacer(modifier = Modifier.height(14.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         // Glass search bar with icon
         Row(
@@ -166,7 +189,7 @@ private fun LibraryRegularToolbar(
                 .clip(glassShape)
                 .background(Color(0x33A78BFA))
                 .border(width = 1.dp, color = Color(0x55FFFFFF), shape = glassShape)
-                .padding(horizontal = 20.dp, vertical = 14.dp),
+                .padding(horizontal = 20.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
