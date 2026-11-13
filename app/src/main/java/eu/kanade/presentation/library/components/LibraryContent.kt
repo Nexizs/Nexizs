@@ -121,10 +121,10 @@ fun LibraryContent(
                 Text(
                     text = chip.label,
                     color = if (selected) Color(0xFF1E1147) else Color(0xFFEDEBFF),
-                    fontSize = 13.sp,
+                    fontSize = 12.sp,
                     fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
-softWrap = false,
+                    softWrap = false,
                     modifier = Modifier
                         .clip(shape)
                         .background(if (selected) Color(0xFFA78BFA) else Color(0x33A78BFA))
