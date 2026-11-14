@@ -1,5 +1,7 @@
 package eu.kanade.presentation.manga.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -7,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -20,7 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
@@ -82,8 +85,14 @@ fun MangaChapterListItem(
         onSwipe = { onChapterSwipe(chapterSwipeEndAction) },
     )
 
+    val cardShape = RoundedCornerShape(20.dp)
+
     SwipeableActionsBox(
-        modifier = Modifier.clipToBounds(),
+        modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .clip(cardShape)
+            .background(Color(0x33A78BFA))
+            .border(width = 1.dp, color = Color(0x55FFFFFF), shape = cardShape),
         startActions = listOfNotNull(start),
         endActions = listOfNotNull(end),
         swipeThreshold = swipeActionThreshold,
@@ -96,7 +105,7 @@ fun MangaChapterListItem(
                     onClick = onClick,
                     onLongClick = onLongClick,
                 )
-                .padding(start = 16.dp, top = 12.dp, end = 8.dp, bottom = 12.dp),
+                .padding(start = 16.dp, top = 14.dp, end = 8.dp, bottom = 14.dp),
         ) {
             Column(
                 modifier = Modifier.weight(1f),
@@ -222,19 +231,3 @@ private fun swipeAction(
     background: Color,
     isUndo: Boolean = false,
 ): me.saket.swipe.SwipeAction {
-    return me.saket.swipe.SwipeAction(
-        icon = {
-            Icon(
-                modifier = Modifier.padding(16.dp),
-                imageVector = icon,
-                tint = contentColorFor(background),
-                contentDescription = null,
-            )
-        },
-        background = background,
-        onSwipe = onSwipe,
-        isUndo = isUndo,
-    )
-}
-
-private val swipeActionThreshold = 56.dp
