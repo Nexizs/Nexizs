@@ -108,7 +108,7 @@ private fun LibraryRegularToolbar(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
             .statusBarsPadding()
-            .padding(horizontal = 16.dp, vertical = 2.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp),
     ) {
         // Top row: only action buttons, right aligned
         Row(
@@ -156,7 +156,7 @@ private fun LibraryRegularToolbar(
             )
         }
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(56.dp))
 
         // Big title
         Row(
@@ -180,7 +180,7 @@ private fun LibraryRegularToolbar(
             }
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(14.dp))
 
         // Glass search bar with icon
         Row(
@@ -189,7 +189,7 @@ private fun LibraryRegularToolbar(
                 .clip(glassShape)
                 .background(Color(0x33A78BFA))
                 .border(width = 1.dp, color = Color(0x55FFFFFF), shape = glassShape)
-                .padding(horizontal = 20.dp, vertical = 12.dp),
+                .padding(horizontal = 20.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
