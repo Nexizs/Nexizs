@@ -4,9 +4,12 @@ import android.content.Context
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialExpressiveTheme
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import eu.kanade.domain.ui.model.AppTheme
 import eu.kanade.presentation.theme.colorscheme.BaseColorScheme
 import eu.kanade.presentation.theme.colorscheme.CatppuccinColorScheme
@@ -24,7 +27,30 @@ import eu.kanade.presentation.theme.colorscheme.TidalWaveColorScheme
 import eu.kanade.presentation.theme.colorscheme.TokyoNightColorScheme
 import eu.kanade.presentation.theme.colorscheme.YinYangColorScheme
 import eu.kanade.presentation.theme.colorscheme.YotsubaColorScheme
+import eu.kanade.tachiyomi.R
 import mihon.app.di.appGraph
+
+private val RighteousFamily = FontFamily(Font(R.font.righteous))
+
+private val RighteousTypography: Typography = Typography().let { base ->
+    base.copy(
+        displayLarge = base.displayLarge.copy(fontFamily = RighteousFamily),
+        displayMedium = base.displayMedium.copy(fontFamily = RighteousFamily),
+        displaySmall = base.displaySmall.copy(fontFamily = RighteousFamily),
+        headlineLarge = base.headlineLarge.copy(fontFamily = RighteousFamily),
+        headlineMedium = base.headlineMedium.copy(fontFamily = RighteousFamily),
+        headlineSmall = base.headlineSmall.copy(fontFamily = RighteousFamily),
+        titleLarge = base.titleLarge.copy(fontFamily = RighteousFamily),
+        titleMedium = base.titleMedium.copy(fontFamily = RighteousFamily),
+        titleSmall = base.titleSmall.copy(fontFamily = RighteousFamily),
+        bodyLarge = base.bodyLarge.copy(fontFamily = RighteousFamily),
+        bodyMedium = base.bodyMedium.copy(fontFamily = RighteousFamily),
+        bodySmall = base.bodySmall.copy(fontFamily = RighteousFamily),
+        labelLarge = base.labelLarge.copy(fontFamily = RighteousFamily),
+        labelMedium = base.labelMedium.copy(fontFamily = RighteousFamily),
+        labelSmall = base.labelSmall.copy(fontFamily = RighteousFamily),
+    )
+}
 
 @Composable
 fun TachiyomiTheme(
@@ -65,6 +91,7 @@ private fun BaseTachiyomiTheme(
                 isAmoled = isAmoled,
             )
         },
+        typography = RighteousTypography,
         content = content,
     )
 }
