@@ -1,9 +1,9 @@
 package eu.kanade.presentation.reader.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsDraggedAsState
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,13 +16,11 @@ import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButtonColors
 import androidx.compose.material3.IconButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.SliderState
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalSlider
 import androidx.compose.material3.rememberSliderState
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -103,13 +101,13 @@ fun ChapterNavigator(
     val isTabletUi = isTabletUi()
     val mainAxisPadding = if (isTabletUi) 24.dp else 8.dp
 
-    // Match with toolbar background color set in ReaderActivity
-    val backgroundColor = MaterialTheme.colorScheme
-        .surfaceColorAtElevation(3.dp)
-        .copy(alpha = if (isSystemInDarkTheme()) 0.9f else 0.95f)
+    // Glass look for the chapter navigator
+    val backgroundColor = Color(0xCC1B1840)
     val buttonColor = IconButtonDefaults.filledIconButtonColors(
-        containerColor = backgroundColor,
-        disabledContainerColor = backgroundColor,
+        containerColor = Color(0x33A78BFA),
+        contentColor = Color(0xFFEDEBFF),
+        disabledContainerColor = Color(0x1AA78BFA),
+        disabledContentColor = Color(0x66EDEBFF),
     )
 
     val onPageChange: (Int) -> Unit = { onPageIndexChange(it - 1) }
@@ -200,6 +198,7 @@ fun HorizontalChapterNavigator(
                             .weight(1f)
                             .clip(RoundedCornerShape(24.dp))
                             .background(backgroundColor)
+                            .border(width = 1.dp, color = Color(0x55FFFFFF), shape = RoundedCornerShape(24.dp))
                             .padding(horizontal = 16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -223,7 +222,7 @@ fun HorizontalChapterNavigator(
                     }
                 }
             } else {
-                Spacer(Modifier.weight(1f))
+                Spacer(modifier = Modifier.weight(1f))
             }
 
             FilledIconButton(
@@ -283,6 +282,7 @@ fun VerticalChapterNavigator(
                     .weight(1f)
                     .clip(RoundedCornerShape(24.dp))
                     .background(backgroundColor)
+                    .border(width = 1.dp, color = Color(0x55FFFFFF), shape = RoundedCornerShape(24.dp))
                     .padding(vertical = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -301,7 +301,7 @@ fun VerticalChapterNavigator(
                 Text(text = totalPages.toString())
             }
         } else {
-            Spacer(Modifier.weight(1f))
+            Spacer(modifier = Modifier.weight(1f))
         }
 
         FilledIconButton(
