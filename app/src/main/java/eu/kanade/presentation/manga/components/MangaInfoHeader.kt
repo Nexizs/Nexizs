@@ -7,6 +7,7 @@ import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +24,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.appendInlineContent
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.DropdownMenuItem
@@ -46,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
@@ -143,8 +147,8 @@ fun MangaInfoBox(
                         brush = Brush.verticalGradient(colors = backdropGradientColors),
                     )
                 }
-                .blur(4.dp)
-                .alpha(0.2f),
+                .blur(8.dp)
+                .alpha(0.35f),
         )
 
         // Manga & source info
@@ -200,19 +204,23 @@ fun MangaActionRow(
         }
     }
 
-    Row(modifier = modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp)) {
-        MangaActionButton(
+    Row(
+        modifier = modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        MangaPillButton(
             title = if (favorite) {
                 stringResource(MR.strings.in_library)
             } else {
                 stringResource(MR.strings.add_to_library)
             },
             icon = if (favorite) MaterialSymbols.RoundedFilled.Favorite else MaterialSymbols.Rounded.Favorite,
-            color = if (favorite) MaterialTheme.colorScheme.primary else defaultActionButtonColor,
+            color = if (favorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
             onClick = onAddToLibraryClicked,
             onLongClick = onEditCategory,
         )
-        MangaActionButton(
+        MangaRoundActionButton(
             title = when (nextUpdateDays) {
                 null -> stringResource(MR.strings.not_applicable)
                 0 -> stringResource(MR.strings.manga_interval_expected_update_soon)
@@ -226,7 +234,7 @@ fun MangaActionRow(
             color = if (isUserIntervalMode) MaterialTheme.colorScheme.primary else defaultActionButtonColor,
             onClick = { onEditIntervalClicked?.invoke() },
         )
-        MangaActionButton(
+        MangaRoundActionButton(
             title = if (trackingCount == 0) {
                 stringResource(MR.strings.manga_tracking_tab)
             } else {
@@ -237,7 +245,7 @@ fun MangaActionRow(
             onClick = onTrackingClicked,
         )
         if (onWebViewClicked != null) {
-            MangaActionButton(
+            MangaRoundActionButton(
                 title = stringResource(MR.strings.action_web_view),
                 icon = MaterialSymbols.Rounded.Public,
                 color = defaultActionButtonColor,
@@ -404,7 +412,9 @@ private fun MangaAndSourceTitlesSmall(
         MangaCover.Book(
             modifier = Modifier
                 .sizeIn(maxWidth = 100.dp)
-                .align(Alignment.Top),
+                .align(Alignment.Top)
+                .clip(RoundedCornerShape(16.dp))
+                .border(width = 1.dp, color = Color(0x66FFFFFF), shape = RoundedCornerShape(16.dp)),
             data = ImageRequest.Builder(LocalContext.current)
                 .data(manga)
                 .crossfade(true)
@@ -726,7 +736,43 @@ private fun TagsChip(
 }
 
 @Composable
-private fun RowScope.MangaActionButton(
+private fun RowScope.MangaPillButton(
+    title: String,
+    icon: ImageVector,
+    color: Color,
+    onClick: () -> Unit,
+    onLongClick: (() -> Unit)? = null,
+) {
+    val pillShape = RoundedCornerShape(28.dp)
+    TextButton(
+        onClick = onClick,
+        modifier = Modifier
+            .clip(pillShape)
+            .background(Color(0x33A78BFA))
+            .border(width = 1.dp, color = Color(0x55FFFFFF), shape = pillShape),
+        onLongClick = onLongClick,
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = null,
+                tint = color,
+                modifier = Modifier.size(20.dp),
+            )
+            Text(
+                text = title,
+                color = color,
+                fontSize = 14.sp,
+            )
+        }
+    }
+}
+
+@Composable
+private fun RowScope.MangaRoundActionButton(
     title: String,
     icon: ImageVector,
     color: Color,
@@ -735,23 +781,18 @@ private fun RowScope.MangaActionButton(
 ) {
     TextButton(
         onClick = onClick,
-        modifier = Modifier.weight(1f),
+        modifier = Modifier
+            .size(44.dp)
+            .clip(CircleShape)
+            .background(Color(0x33A78BFA))
+            .border(width = 1.dp, color = Color(0x55FFFFFF), shape = CircleShape),
         onLongClick = onLongClick,
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = color,
-                modifier = Modifier.size(20.dp),
-            )
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text = title,
-                color = color,
-                fontSize = 12.sp,
-                textAlign = TextAlign.Center,
-            )
-        }
+        Icon(
+            imageVector = icon,
+            contentDescription = title,
+            tint = color,
+            modifier = Modifier.size(20.dp),
+        )
     }
 }
