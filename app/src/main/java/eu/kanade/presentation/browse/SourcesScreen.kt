@@ -1,22 +1,26 @@
 package eu.kanade.presentation.browse
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import eu.kanade.presentation.browse.components.BaseSourceItem
 import eu.kanade.tachiyomi.ui.browse.source.SourcesViewModel
 import eu.kanade.tachiyomi.ui.browse.source.browse.BrowseSourceViewModel.Listing
@@ -114,27 +118,53 @@ private fun SourceItem(
     onClickPin: (Source) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val cardShape = RoundedCornerShape(20.dp)
     BaseSourceItem(
-        modifier = modifier,
+        modifier = modifier
+            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .clip(cardShape)
+            .background(Color(0x33A78BFA))
+            .border(width = 1.dp, color = Color(0x55FFFFFF), shape = cardShape),
         source = source,
         onClickItem = { onClickItem(source, Listing.Popular) },
         onLongClickItem = { onLongClickItem(source) },
         action = {
             if (source.supportsLatest) {
-                TextButton(onClick = { onClickItem(source, Listing.Latest) }) {
-                    Text(
-                        text = stringResource(MR.strings.latest),
-                        style = LocalTextStyle.current.copy(
-                            color = MaterialTheme.colorScheme.primary,
-                        ),
-                    )
-                }
+                SourcePill(
+                    text = stringResource(MR.strings.latest),
+                    onClick = { onClickItem(source, Listing.Latest) },
+                )
             }
+            SourcePill(
+                text = "Popular",
+                onClick = { onClickItem(source, Listing.Popular) },
+            )
             SourcePinButton(
                 isPinned = Pin.Pinned in source.pin,
                 onClick = { onClickPin(source) },
             )
         },
+    )
+}
+
+@Composable
+private fun SourcePill(
+    text: String,
+    onClick: () -> Unit,
+) {
+    val pillShape = RoundedCornerShape(16.dp)
+    Text(
+        text = text,
+        color = MaterialTheme.colorScheme.onBackground,
+        fontSize = 12.sp,
+        maxLines = 1,
+        modifier = Modifier
+            .padding(end = 6.dp)
+            .clip(pillShape)
+            .background(Color(0x33A78BFA))
+            .border(width = 1.dp, color = Color(0x55FFFFFF), shape = pillShape)
+            .clickable(onClick = onClick)
+            .padding(horizontal = 10.dp, vertical = 6.dp),
     )
 }
 
