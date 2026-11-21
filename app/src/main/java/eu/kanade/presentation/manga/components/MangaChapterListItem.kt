@@ -231,3 +231,19 @@ private fun swipeAction(
     background: Color,
     isUndo: Boolean = false,
 ): me.saket.swipe.SwipeAction {
+    return me.saket.swipe.SwipeAction(
+        icon = {
+            Icon(
+                modifier = Modifier.padding(16.dp),
+                imageVector = icon,
+                tint = contentColorFor(background),
+                contentDescription = null,
+            )
+        },
+        background = background,
+        onSwipe = onSwipe,
+        isUndo = isUndo,
+    )
+}
+
+private val swipeActionThreshold = 56.dp
