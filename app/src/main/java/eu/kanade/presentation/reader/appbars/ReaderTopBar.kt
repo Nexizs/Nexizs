@@ -1,8 +1,12 @@
 package eu.kanade.presentation.reader.appbars
 
+import androidx.compose.foundation.border
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import eu.kanade.presentation.components.AppBar
 import eu.kanade.presentation.components.AppBarActions
 import mihon.icons.materialsymbols.MaterialSymbols
@@ -23,9 +27,12 @@ fun ReaderTopBar(
     onShare: (() -> Unit)?,
     modifier: Modifier = Modifier,
 ) {
+    val barShape = RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp)
     AppBar(
-        modifier = modifier,
-        backgroundColor = Color.Transparent,
+        modifier = modifier
+            .clip(barShape)
+            .border(width = 1.dp, color = Color(0x55FFFFFF), shape = barShape),
+        backgroundColor = Color(0xCC1B1840),
         title = mangaTitle,
         subtitle = chapterTitle,
         navigateUp = navigateUp,
