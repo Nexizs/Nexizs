@@ -37,8 +37,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import dev.zacsweers.metrox.viewmodel.metroViewModel
 import eu.kanade.presentation.components.AppBar
 import eu.kanade.presentation.components.AppBarActions
+import eu.kanade.tachiyomi.ui.more.MoreViewModel
 import eu.kanade.tachiyomi.ui.setting.SettingsScreen
 import eu.kanade.tachiyomi.ui.stats.StatsScreen
 import mihon.icons.materialsymbols.MaterialSymbols
@@ -100,6 +102,8 @@ private fun LibraryRegularToolbar(
 ) {
     val navigator = LocalNavigator.currentOrThrow
     val uriHandler = LocalUriHandler.current
+    val moreViewModel = metroViewModel<MoreViewModel>()
+    val incognito = moreViewModel.incognitoMode
     val pillAlpha = if (isSystemInDarkTheme()) 0.12f else 0.08f
     val filterTint = if (hasFilters) MaterialTheme.colorScheme.active else LocalContentColor.current
     val glassShape = RoundedCornerShape(28.dp)
@@ -123,6 +127,10 @@ private fun LibraryRegularToolbar(
                         icon = MaterialSymbols.Rounded.FilterList,
                         iconTint = filterTint,
                         onClick = onClickFilter,
+                    ),
+                    AppBar.OverflowAction(
+                        title = if (incognito) "Turn off Incognito mode" else "Turn on Incognito mode",
+                        onClick = { moreViewModel.incognitoMode = !incognito },
                     ),
                     AppBar.OverflowAction(
                         title = stringResource(MR.strings.label_settings),
